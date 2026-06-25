@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comanda | THE CAPITAL SALAD</title>
+<style>
+*{box-sizing:border-box}
+:root{--ticket-font:"Courier New",monospace;--ticket-size:12px}
+html,body{margin:0;background:#ececec;color:#111;font-family:Arial,Helvetica,sans-serif}
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 10px 28px;gap:12px}
+.toolbar{width:100%;max-width:420px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.toolbar.settings{background:#fff;border-radius:10px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.tool{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#333}
+.tool select{border:1px solid #cfcfcf;border-radius:7px;background:#fff;padding:8px 9px;font-size:12px;font-weight:800;color:#111}
+.btn{border:0;background:#111;color:#fff;border-radius:8px;padding:10px 14px;font-weight:800;font-size:13px;cursor:pointer}
+.btn.secondary{background:#6d6d6d}
+.ticket{width:58mm;min-height:80mm;background:#fff;padding:4mm 3mm;color:#111;box-shadow:0 10px 30px rgba(0,0,0,.18);font-family:var(--ticket-font);font-size:var(--ticket-size);line-height:1.28}
+.logo{display:block;width:30mm;height:auto;margin:0 auto 2mm;filter:grayscale(1) contrast(1.18)}
+.brand{text-align:center;font-weight:900;font-size:calc(var(--ticket-size) + 2px);letter-spacing:.4px;margin-bottom:1mm}
+.sub{text-align:center;font-size:calc(var(--ticket-size) - 3px);line-height:1.25;margin-bottom:2mm}
+.hr{border:0;border-top:1px dashed #111;margin:2mm 0}
+.row{display:flex;justify-content:space-between;gap:2mm;align-items:flex-start}
+.row .l{font-weight:700}.row .r{text-align:right;word-break:break-word}
+.sec{font-weight:900;text-align:center;font-size:calc(var(--ticket-size) + 1px);margin:1.5mm 0;text-transform:uppercase}
+.item{margin:1.5mm 0}.item-top{display:flex;justify-content:space-between;gap:2mm;font-weight:900}.item-name{max-width:36mm}.item-price{text-align:right;white-space:nowrap}.detail{font-size:calc(var(--ticket-size) - 1px);padding-left:2mm;word-break:break-word}.total{display:flex;justify-content:space-between;font-size:calc(var(--ticket-size) + 4px);font-weight:900;margin-top:2mm}.foot{text-align:center;font-size:calc(var(--ticket-size) - 3px);margin-top:2mm}.muted{text-align:center;color:#666;font-size:12px;max-width:320px}.error{max-width:420px;background:#fff;border-radius:10px;padding:18px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.loading{padding:30px 0;text-align:center;font-weight:800;color:#555}
+@page{size:58mm auto;margin:0}
+@media print{html,body{background:#fff}.page{display:block;padding:0}.toolbar,.muted{display:none}.ticket{width:58mm;box-shadow:none;margin:0;padding:4mm 3mm}.error{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="toolbar">
+    <button class="btn" onclick="window.print()">Imprimir</button>
+    <button class="btn secondary" onclick="copyLink()">Copiar link</button>
+  </div>
+  <div class="toolbar settings">
+    <label class="tool">Tamano
+      <select id="ticketSize" onchange="setTicketSize(this.value)">
+        <option value="10">Compacto</option>
+        <option value="11">Normal</option>
+        <option value="12">Grande</option>
+        <option value="13">Extra</option>
+      </select>
+    </label>
+    <label class="tool">Fuente
+      <select id="ticketFont" onchange="setTicketFont(this.value)">
+        <option value="mono">Ticket</option>
+        <option value="arial">Arial</option>
+        <option value="verdana">Verdana</option>
+        <option value="tahoma">Tahoma</option>
+      </select>
+    </label>
+  </div>
+  <div id="ticket" class="ticket"><div class="loading">Cargando comanda...</div></div>
+  <div class="muted">Formato preparado para impresora termica de 58mm.</div>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuEXW9XOGUB6wn-BsQ-KOzC2gy_Do6GdA",
+  authDomain: "thecapitalsalad-b2b97.firebaseapp.com",
+  projectId: "thecapitalsalad-b2b97",
+  storageBucket: "thecapitalsalad-b2b97.firebasestorage.app",
+  messagingSenderId: "889311747332",
+  appId: "1:889311747332:web:24d6de86041541c3bec451"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const ticket = document.getElementById('ticket');
+const ticketSizeSelect = document.getElementById('ticketSize');
+const ticketFontSelect = document.getElementById('ticketFont');
+const ticketStylePrefs = {
+  size: localStorage.getItem('tcs_ticket_size') || '12',
+  font: localStorage.getItem('tcs_ticket_font') || 'mono'
+};
+const ticketFonts = {
+  mono: '"Courier New", monospace',
+  arial: 'Arial, Helvetica, sans-serif',
+  verdana: 'Verdana, Geneva, sans-serif',
+  tahoma: 'Tahoma, Geneva, sans-serif'
+};
+
+function applyTicketStyle(){
+  document.documentElement.style.setProperty('--ticket-size', ticketStylePrefs.size + 'px');
+  document.documentElement.style.setProperty('--ticket-font', ticketFonts[ticketStylePrefs.font] || ticketFonts.mono);
+  if(ticketSizeSelect) ticketSizeSelect.value = ticketStylePrefs.size;
+  if(ticketFontSelect) ticketFontSelect.value = ticketStylePrefs.font;
+}
+window.setTicketSize = function(size){
+  ticketStylePrefs.size = size;
+  localStorage.setItem('tcs_ticket_size', size);
+  applyTicketStyle();
+};
+window.setTicketFont = function(font){
+  ticketStylePrefs.font = font;
+  localStorage.setItem('tcs_ticket_font', font);
+  applyTicketStyle();
+};
+applyTicketStyle();
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+
+window.copyLink = function(){
+  navigator.clipboard.writeText(location.href).then(function(){ alert('Link copiado'); });
+};
+
+function esc(v){
+  return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function money(v){ return '$' + Number(v||0).toFixed(0); }
+function toDate(v){
+  if(!v) return null;
+  if(typeof v.toDate === 'function') return v.toDate();
+  if(v.seconds) return new Date(v.seconds*1000);
+  return new Date(v);
+}
+function fmtDate(d){
+  if(!d || isNaN(d.getTime())) return '';
+  return d.toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'});
+}
+function deliveryText(c){
+  if(c && c.modo === 'delivery') return 'Domicilio: ' + (c.addr || '');
+  return 'Pasa a recoger en sucursal';
+}
+function renderOrder(o){
+  var c = o.cliente || {};
+  var created = toDate(o.createdAt) || new Date(o.fecha || Date.now());
+  var expires = toDate(o.expiresAt) || (o.expiresAtMillis ? new Date(Number(o.expiresAtMillis)) : null);
+  if(expires && Date.now() > expires.getTime()){
+    ticket.className = 'error';
+    ticket.innerHTML = '<h2>Comanda vencida</h2><p>Este link ya supero la vigencia de 30 dias.</p>';
+    return;
+  }
+  var items = (o.productos || []).map(function(it){
+    var details = String(it.d || '').split('|').filter(Boolean).map(function(d){return '<div class="detail">- '+esc(d)+'</div>';}).join('');
+    if(it.promoDesc) details += '<div class="detail">- '+esc(it.promoDesc)+'</div>';
+    return '<div class="item"><div class="item-top"><div class="item-name">'+esc((it.q>1?it.q+'x ':'')+(it.t||''))+'</div><div class="item-price">'+money(it.p)+'</div></div>'+details+'</div>';
+  }).join('');
+  var envio = o.envio || (c && c.envio) || null;
+  var subtotal = Number(o.subtotal || o.total || 0);
+  var descuentoPuntos = Number(o.descuentoPuntos || 0);
+  var puntosUsados = Number(o.puntosUsados || 0);
+  var puntosGanados = Number(o.puntosGanados || 0);
+  var totalFinal = Number(o.totalFinal || o.total || Math.max(0, subtotal - descuentoPuntos));
+  var puntosHtml = '';
+  if(descuentoPuntos > 0){
+    puntosHtml += '<div class="row"><div class="l">Puntos usados</div><div class="r">-'+money(descuentoPuntos)+'</div></div>'+
+      '<div class="detail">'+puntosUsados+' puntos canjeados</div>';
+  }
+  if(puntosGanados > 0){
+    puntosHtml += '<div class="detail">Puntos ganados: '+puntosGanados+' (vencen en 6 meses)</div>';
+  }
+  var envioHtml = '';
+  if(c && c.modo === 'delivery'){
+    if(envio && !envio.error && !envio.overLimit && envio.fee != null){
+      envioHtml = '<div class="row"><div class="l">Envio</div><div class="r">'+money(envio.fee)+'</div></div>'+
+        (envio.distanceKm ? '<div class="detail">Distancia aprox: '+esc(envio.distanceKm)+' km</div>' : '')+
+        (envio.extraFee ? '<div class="detail">Extra '+esc(envio.extraZone)+': '+money(envio.extraFee)+'</div>' : '');
+    } else {
+      envioHtml = '<div class="row"><div class="l">Envio</div><div class="r">Por confirmar</div></div>';
+      totalFinal = Math.max(0, subtotal - descuentoPuntos);
+    }
+  }
+  var pagoHtml = '<div class="hr"></div><div class="sec">Pago</div>'+
+    '<div class="row"><div class="l">Metodo</div><div class="r">'+esc(c.pagoTexto || (c.pago === 'transferencia' ? 'Transferencia' : 'Efectivo'))+'</div></div>';
+  if(c.pago === 'transferencia'){
+    pagoHtml += '<div class="detail">Transferencia Banregio</div><div class="detail">Verificar comprobante antes de entregar.</div>';
+  } else {
+    pagoHtml += '<div class="detail">Pagara con: '+esc(c.efectivoCon || 'No indicado')+'</div>';
+  }
+  ticket.className = 'ticket';
+  ticket.innerHTML =
+    '<img class="logo" src="logo-the-capital-salad.png" alt="THE CAPITAL SALAD">'+
+    '<div class="brand">THE CAPITAL SALAD</div>'+
+    '<div class="sub">Antonio Caso #3002, Col. Casa Blanca<br>Tel: 644 142 8792</div>'+
+    '<div class="hr"></div>'+
+    '<div class="row"><div class="l">Folio</div><div class="r">'+esc(o.folio||'')+'</div></div>'+
+    '<div class="row"><div class="l">Fecha</div><div class="r">'+esc(o.fechaTexto || fmtDate(created))+'</div></div>'+
+    '<div class="row"><div class="l">Cuando</div><div class="r">'+esc(c.cuando || 'Lo antes posible')+'</div></div>'+
+    '<div class="hr"></div>'+
+    '<div class="row"><div class="l">Cliente</div><div class="r">'+esc(c.nombre||'')+'</div></div>'+
+    '<div class="row"><div class="l">Tel</div><div class="r">'+esc(c.tel||'')+'</div></div>'+
+    '<div class="detail">'+esc(deliveryText(c))+'</div>'+
+    (c.notas ? '<div class="detail">Notas: '+esc(c.notas)+'</div>' : '')+
+    '<div class="hr"></div><div class="sec">Productos</div>'+
+    items+
+    '<div class="hr"></div>'+
+    '<div class="row"><div class="l">Subtotal</div><div class="r">'+money(subtotal)+'</div></div>'+
+    puntosHtml+
+    envioHtml+
+    '<div class="total"><span>Total</span><span>'+(c && c.modo === 'delivery' && envio && (envio.error || envio.overLimit || envio.fee == null) ? money(Math.max(0, subtotal - descuentoPuntos))+' + envio' : money(totalFinal))+'</span></div>'+
+    pagoHtml+
+    '<div class="hr"></div><div class="foot">Gracias por tu pedido<br>@thecapitalsaladoficial<br>Comanda valida por 30 dias</div>';
+}
+
+if(!id){
+  ticket.className = 'error';
+  ticket.innerHTML = '<h2>Sin comanda</h2><p>Falta el ID del pedido en el link.</p>';
+} else {
+  getDoc(doc(db,'comandas',id)).then(function(snap){
+    if(!snap.exists()){
+      ticket.className = 'error';
+      ticket.innerHTML = '<h2>No encontrada</h2><p>La comanda no existe o ya fue eliminada.</p>';
+      return;
+    }
+    renderOrder(snap.data());
+    if(params.get('print') === '1') setTimeout(function(){ window.print(); }, 500);
+  }).catch(function(e){
+    console.warn(e);
+    var code = e && e.code ? String(e.code) : '';
+    var msg = code.indexOf('permission-denied') >= 0
+      ? 'Firestore bloqueo la lectura. Revisa que el link este completo y que las reglas de comandas esten publicadas.'
+      : 'No se pudo cargar la comanda. Revisa conexion o intenta abrir el link de nuevo.';
+    ticket.className = 'error';
+    ticket.innerHTML = '<h2>Error</h2><p>'+esc(msg)+'</p>';
+  });
+}
+</script>
+</body>
+</html>
