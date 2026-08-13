@@ -2186,6 +2186,262 @@ footer{background:var(--text);color:#fff;padding:24px 16px;margin-top:16px;max-w
       applyAuthState(null, null);
     }
   });</script>
+<style>
+/* CLICKSON VISUAL REFRESH 2026 - solo apariencia, sin tocar flujo funcional */
+:root{
+  --g:#85b62f;
+  --gd:#224f16;
+  --gl:#b8dc58;
+  --gbg:#f4fae9;
+  --gm:#e4ead8;
+  --gray:#5e6657;
+  --text:#17210f;
+  --mut:#737a6d;
+  --org:#ef7f16;
+  --wa:#24d366;
+  --r:22px;
+  --rs:14px;
+  --sh:0 14px 34px rgba(33,64,18,.11);
+  --shg:0 18px 42px rgba(111,142,40,.24);
+}
+
+body{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.62) 0 14%,transparent 14% 100%),
+    linear-gradient(180deg,#f8fbf1 0%,#dfedc7 38%,#edf5df 100%);
+}
+
+.wrap{
+  background:
+    linear-gradient(120deg,rgba(141,179,52,.07) 0 1px,transparent 1px 24px),
+    linear-gradient(180deg,#fbfff5 0%,#eef6df 44%,#f9fcf2 100%);
+  box-shadow:0 18px 70px rgba(31,54,17,.16);
+  position:relative;
+}
+
+.hdr{
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(139,179,52,.16);
+  box-shadow:0 10px 26px rgba(31,54,17,.08);
+}
+
+.hdr-in{padding:11px 16px}
+.logo-img{width:50px;height:50px;border:3px solid #fff;box-shadow:0 0 0 2px var(--g),0 8px 18px rgba(32,64,14,.16)}
+.logo-t .the{font-size:10px;color:#758067;font-weight:800}
+.logo-t .brand{font-size:17px;color:var(--gd);letter-spacing:.2px}
+.cart-btn{
+  min-height:44px;
+  padding:10px 17px;
+  background:linear-gradient(135deg,var(--g),#78a923);
+  box-shadow:0 10px 22px rgba(116,161,34,.24);
+}
+.cc{width:24px;height:24px;color:var(--gd);box-shadow:inset 0 0 0 1px rgba(141,179,52,.15)}
+
+.hero{
+  min-height:430px;
+  justify-content:center;
+  padding:42px 24px 38px;
+  border-radius:0 0 34px 34px;
+  isolation:isolate;
+}
+.hbg{background:linear-gradient(180deg,rgba(9,37,13,.34),rgba(15,61,17,.92)),linear-gradient(145deg,#123d14,#8db334)}
+.hbg2{opacity:.34;filter:saturate(1.1) contrast(1.06)}
+.hero::after{
+  content:'';
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:20px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  z-index:1;
+}
+.hero-logo{
+  width:138px;
+  height:138px;
+  border:6px solid rgba(255,255,255,.94);
+  box-shadow:0 20px 44px rgba(0,0,0,.32),0 0 0 10px rgba(255,255,255,.1);
+  margin-bottom:16px;
+}
+.hbadge{
+  background:rgba(255,255,255,.18);
+  border-color:rgba(255,255,255,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24);
+  font-weight:800;
+}
+.hero h1{font-size:38px;letter-spacing:0;text-shadow:0 4px 22px rgba(0,0,0,.32)}
+.hero p{font-size:14px;font-weight:600;max-width:330px;color:rgba(255,255,255,.94)}
+
+.sec,.gallery-sec{padding:22px 18px 0}
+.slbl,.gallery-title{
+  color:#59644e;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:1.4px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.auth-bar{
+  margin:18px 18px 0;
+  border:1px solid rgba(141,179,52,.18);
+  border-radius:22px;
+  background:#fff;
+  box-shadow:var(--sh);
+}
+.auth-avatar{background:linear-gradient(135deg,#edf8dc,#d5efaa);color:var(--gd)}
+.auth-name{color:var(--gd);font-weight:900}
+.btn-login{box-shadow:0 8px 18px rgba(116,161,34,.2)}
+
+.promo-circles{gap:14px}
+.promo-circle-wrap{
+  background:#fff;
+  border-radius:20px;
+  padding:10px 8px;
+  box-shadow:var(--sh);
+  border:1px solid rgba(141,179,52,.16);
+}
+.promo-circle-img{box-shadow:0 10px 22px rgba(31,54,17,.12)}
+.promo-circle-price{background:var(--org);color:#fff;border-radius:999px;padding:2px 9px;display:inline-block}
+.promo-banner{border-radius:22px;box-shadow:0 14px 34px rgba(239,127,22,.24)}
+
+.gallery-grid{gap:12px}
+.gallery-item{
+  border-radius:24px;
+  box-shadow:0 14px 30px rgba(31,54,17,.15);
+}
+.gallery-item.big{height:218px}
+.gallery-item.small{height:142px}
+.gallery-overlay{padding:15px;background:linear-gradient(to top,rgba(10,22,7,.82),rgba(10,22,7,.08))}
+.gallery-lbl{font-size:15px;font-weight:900}
+.gallery-sub{font-size:11px;font-weight:600}
+
+.wgrid{gap:12px}
+.wcard{
+  border:1px solid rgba(141,179,52,.16);
+  border-radius:20px;
+  box-shadow:var(--sh);
+}
+.wico{
+  width:42px;
+  height:42px;
+  margin:0 auto 9px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--gbg);
+}
+
+.cgrid{gap:12px!important}
+.cbt{
+  min-height:132px;
+  border:1px solid rgba(141,179,52,.2);
+  border-radius:24px;
+  padding:18px 10px;
+  box-shadow:var(--sh);
+}
+.cbt .cico{
+  width:50px;
+  height:50px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#f7ffeb,#d7efaa);
+  color:var(--gd);
+  box-shadow:inset 0 0 0 1px rgba(141,179,52,.14);
+}
+.cbt.on{
+  background:linear-gradient(180deg,#f7ffe8,#fff);
+  border-color:var(--g);
+  box-shadow:var(--shg);
+}
+.clbl{font-size:13px;color:var(--text);font-weight:900}
+.csub{font-size:11px;font-weight:700;color:var(--g)}
+
+.stepper{background:#fff;border-radius:20px;padding:14px 10px;box-shadow:var(--sh)}
+.sdot{background:#eef3e5}
+.step.active .sdot,.step.done .sdot{background:linear-gradient(135deg,var(--g),#78a923)}
+.builder,.cart-panel,.cntbox,.cust-form-box,.socbox{
+  border:1px solid rgba(141,179,52,.16);
+  border-radius:24px;
+  box-shadow:var(--sh);
+}
+.bhd,.chd,.cnthd,.cust-form-hd{
+  background:linear-gradient(135deg,var(--g),#78a923);
+}
+.bbd,.cbdy,.cntbd,.cust-form-body{background:#fff}
+.oc,.szcard,.bgcard,.cust-inp,.pickup-opt{
+  border-color:#dce8ce;
+  border-radius:16px;
+}
+.oc.on,.szcard.on,.bgcard.on,.pickup-opt.on{
+  background:#f6fcea;
+  border-color:var(--g);
+  box-shadow:0 10px 22px rgba(141,179,52,.12);
+}
+.btn-nx,.btn-wa,.btn-print.wa,.dq-btn,.points-redeem button{
+  background:linear-gradient(135deg,#1fc95f,var(--wa));
+  box-shadow:0 13px 26px rgba(36,211,102,.22);
+}
+.btn-am,.btn-bk,.btn-close-m{
+  background:#fff;
+  border-color:#dce8ce;
+}
+.ctot{
+  background:linear-gradient(135deg,#f4fae9,#fff);
+  border-top:1px solid rgba(141,179,52,.14);
+}
+.camt,.cipr,.prprice,.szpr,.bgpr{color:var(--gd)}
+.ecart{background:linear-gradient(180deg,#fff,#f9fcf2)}
+
+.cust-lbl{color:#46513d}
+.cust-inp:focus{border-color:var(--g);box-shadow:0 0 0 4px rgba(141,179,52,.12)}
+.pay-info,.delivery-quote,.points-redeem{
+  border-radius:18px;
+  border-color:#dce8ce;
+  background:linear-gradient(180deg,#fbfff5,#fff);
+}
+.tracking-banner{
+  margin:18px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#5f8f18,#8db334);
+  box-shadow:var(--shg);
+}
+.hist-list{max-height:280px}
+.pts-badge{background:linear-gradient(135deg,var(--org),#ff9b2d);box-shadow:0 8px 18px rgba(239,127,22,.22)}
+.hist-toggle{min-height:32px}
+.hist-item{border-color:#e6eddc}
+.map-box{
+  border-radius:24px;
+  border:1px solid rgba(141,179,52,.16);
+  box-shadow:var(--sh);
+}
+.map-dir-btn{background:linear-gradient(135deg,var(--gd),var(--g));font-weight:900}
+.socl{border-radius:16px;background:#fff}
+.waf{
+  width:58px;
+  height:58px;
+  right:max(16px,calc((100vw - 480px)/2 + 16px));
+  box-shadow:0 14px 30px rgba(36,211,102,.34);
+}
+footer{
+  background:linear-gradient(180deg,#18230f,#0f170b);
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.flogo{width:72px;height:72px;border-color:#fff;box-shadow:0 0 0 3px var(--g)}
+.fbrand{font-size:18px;color:#b7df50}
+.fhchip{border:1px solid rgba(255,255,255,.08)}
+.fpowered{color:#fff;letter-spacing:1.6px}
+
+@media(max-width:420px){
+  .hero{min-height:405px;padding-left:18px;padding-right:18px}
+  .hero h1{font-size:34px}
+  .hero-logo{width:126px;height:126px}
+  .cart-btn{font-size:12px;padding:9px 13px}
+  .logo-t .brand{font-size:15px}
+}
+</style>
 </head>
 <body>
 
@@ -4382,17 +4638,19 @@ function quoteDelivery(force){
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({origin: DELIVERY_ORIGIN, destination: addr})
   }).then(function(r){
-    if(!r.ok) throw new Error('Respuesta invalida del cotizador');
-    return r.json();
+    return r.json().catch(function(){ return null; }).then(function(data){
+      if(!r.ok) throw new Error((data && (data.message || data.reason)) || 'Respuesta invalida del cotizador');
+      return data;
+    });
   }).then(function(data){
     _deliveryQuoteAddress = addr;
-    _deliveryQuote = data && data.ok ? data : {error:true,message:(data&&data.message)||'No se pudo calcular el envio.'};
+    _deliveryQuote = data && data.ok ? data : {error:true,message:(data&&data.message)||'No se pudo calcular el envio.', reason:data&&data.reason};
     renderDeliveryQuote();
     return _deliveryQuote;
   }).catch(function(e){
     console.warn('Delivery quote error:', e);
     _deliveryQuoteAddress = addr;
-    _deliveryQuote = {error:true,message:'Envio por confirmar. No se pudo conectar con el cotizador.'};
+    _deliveryQuote = {error:true,message:e && e.message ? e.message : 'Envio por confirmar. No se pudo conectar con el cotizador.'};
     renderDeliveryQuote();
     return _deliveryQuote;
   });
@@ -4723,17 +4981,31 @@ function redeemPointsForOrder(uid, points, orderId){
         {merge:true}
       ));
     });
+    if(remaining > 0){
+      var fallbackBalance = Math.max(
+        0,
+        Number(window._fbProfile && window._fbProfile.puntos) || 0,
+        Number(_pointsAvailable) || 0
+      );
+      if(fallbackBalance >= remaining){
+        updates.push(updateProfilePointFallback(uid, -remaining));
+        remaining = 0;
+      }
+    }
     if(remaining > 0) throw new Error('No se pudieron reservar todos los puntos.');
-    updates.push(window._fb.addDoc(window._fb.collection(window._fb.db,'puntos_movimientos'),{
-      uid:uid,
-      tipo:'usado',
-      puntos:points,
-      valorPesos:points * POINT_VALUE_PESOS,
-      pedidoId:orderId || null,
-      fecha:new Date().toISOString(),
-      descripcion:'Puntos canjeados como descuento'
-    }));
-    return Promise.all(updates).then(function(){ return refreshPointsBalance(); });
+    return Promise.all(updates).then(function(){
+      return window._fb.addDoc(window._fb.collection(window._fb.db,'puntos_movimientos'),{
+        uid:uid,
+        tipo:'usado',
+        puntos:points,
+        valorPesos:points * POINT_VALUE_PESOS,
+        pedidoId:orderId || null,
+        fecha:new Date().toISOString(),
+        descripcion:'Puntos canjeados como descuento'
+      }).catch(function(e){
+        console.warn('Used points movement skipped:', e);
+      });
+    }).then(function(){ return refreshPointsBalance(); });
   });
 }
 
@@ -4979,7 +5251,7 @@ sendWA = function(){
     });
   }).catch(function(e){
     console.warn('Points/order error:', e);
-    if(waWin) waWin.close();
+    if(waWin && !waWin.closed) waWin.location.href = 'https://wa.me/526441428792';
     alert('No se pudo procesar el monedero de puntos. Intenta de nuevo o envia el pedido sin canjear puntos.');
   });
 };
@@ -5237,8 +5509,9 @@ sendWA = function(){
           }).catch(function(e){ console.warn('Profile save skipped:', e); });
         });
       }).catch(function(e){
-        if(pointsUsed > 0) throw e;
-        console.warn('Order save skipped, continuing WhatsApp:', e);
+        console.warn('Order or points save skipped, continuing WhatsApp:', e);
+        order.puntosCanjeRevision = pointsUsed > 0;
+        order.puntosError = e && e.message ? e.message : 'Error guardando pedido o puntos';
       });
     }
 
@@ -5251,8 +5524,8 @@ sendWA = function(){
         msg += '\nPor favor confirmar mi pedido. Gracias!';
       }).then(function(){
         var url = 'https://wa.me/526441428792?text=' + encodeURIComponent(msg);
-        if(waWin) waWin.location.href = url;
-        else window.open(url, '_blank');
+        if(waWin && !waWin.closed) waWin.location.href = url;
+        else window.location.href = url;
         closeModal();
         _pointsToRedeem = 0;
         if(typeof showTracking === 'function') showTracking(folio);
@@ -5261,8 +5534,25 @@ sendWA = function(){
     });
   }).catch(function(e){
     console.warn('Redeem/order error:', e);
-    if(waWin) waWin.close();
-    alert('No se pudieron canjear los puntos. Intenta de nuevo o envia el pedido sin usar puntos.');
+    try{
+      _pointsToRedeem = 0;
+      var c = getCustData();
+      var whenText = (typeof getWhenText === 'function') ? getWhenText() : 'Lo antes posible';
+      c.cuando = whenText;
+      c.envio = pickupMode === 'delivery' ? (_deliveryQuote || {error:true,message:'Envio por confirmar'}) : null;
+      var totals = getOrderTotalsWithPoints();
+      var folio = window._currentFolio || '#0001';
+      var msg = buildWhatsAppMessage(c, folio, totals.totalFinal, whenText)
+        + '\nPor favor confirmar mi pedido. Gracias!';
+      var url = 'https://wa.me/526441428792?text=' + encodeURIComponent(msg);
+      if(waWin && !waWin.closed) waWin.location.href = url;
+      else window.location.href = url;
+      closeModal();
+    }catch(recoveryError){
+      console.warn('WhatsApp recovery failed:', recoveryError);
+      if(waWin && !waWin.closed) waWin.location.href = 'https://wa.me/526441428792';
+      else window.location.href = 'https://wa.me/526441428792';
+    }
   });
 };</script>
 
