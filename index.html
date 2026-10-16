@@ -5319,13 +5319,27 @@ buildReceipt = function(){
 openModal = function(){
   if(!cart.length){alert('Agrega productos a tu pedido primero.');return;}
   if(!validateCust())return;
+  if(window._orderModalOpening)return;
+  window._orderModalOpening=true;
+  var submitBtn=document.getElementById('btn-wa');
+  var submitIdleHtml=submitBtn?submitBtn.innerHTML:'';
+  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='Preparando pedido...';}
+  function releaseOrderButton(){
+    window._orderModalOpening=false;
+    if(submitBtn){submitBtn.disabled=false;submitBtn.innerHTML=submitIdleHtml;}
+  }
   Promise.all([ensureDeliveryQuote(), refreshPointsBalance()]).then(function(){
     getNextFolio(function(folio){
       window._currentFolio = folio;
       buildReceipt();
       document.getElementById('receiptModal').classList.remove('hid');
       document.body.style.overflow='hidden';
+      releaseOrderButton();
     });
+  }).catch(function(error){
+    releaseOrderButton();
+    console.warn('No se pudo preparar el pedido:',error);
+    alert('No pudimos preparar el resumen. Revisa tus datos e intenta nuevamente.');
   });
 };
 
