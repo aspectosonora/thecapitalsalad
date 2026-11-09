@@ -6720,5 +6720,177 @@ loadAdminClients = function(){
     })();
   </script>
 
+  <style>
+    .order-flow{position:fixed;inset:0;z-index:450;background:linear-gradient(180deg,#f8fbed 0,#eef5dc 100%);overflow-y:auto;overscroll-behavior:contain;display:none}
+    .order-flow.open{display:block}
+    .order-flow-shell{width:min(100%,760px);min-height:100%;margin:0 auto;background:#f8fbed;box-shadow:0 0 45px rgba(33,54,18,.12)}
+    .order-flow-head{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid #dfe9ca;padding:12px 16px 11px}
+    .order-flow-top{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:10px}
+    .order-flow-back,.order-flow-close{width:42px;height:42px;border:1.5px solid #d6e2bf;border-radius:50%;background:#fff;color:#26351b;font:800 22px/1 Poppins,sans-serif;cursor:pointer;display:grid;place-items:center}
+    .order-flow-logo{display:flex;align-items:center;justify-content:center;gap:9px;color:#26351b;font:900 15px/1.1 Poppins,sans-serif;text-align:center}
+    .order-flow-logo img{width:38px;height:38px;border-radius:50%;object-fit:cover}
+    .order-flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:11px}
+    .order-flow-step{position:relative;text-align:center;color:#8b9582;font:700 9px/1.2 Poppins,sans-serif;padding-top:15px}
+    .order-flow-step:before{content:"";position:absolute;top:4px;left:50%;width:9px;height:9px;border-radius:50%;transform:translateX(-50%);background:#d5ddc9;box-shadow:0 0 0 3px #fff}
+    .order-flow-step:not(:last-child):after{content:"";position:absolute;top:8px;left:57%;width:86%;height:2px;background:#d5ddc9}
+    .order-flow-step.done,.order-flow-step.active{color:#315b18}
+    .order-flow-step.done:before,.order-flow-step.done:after,.order-flow-step.active:before{background:#8ab72f}
+    .order-flow-step.active{font-weight:900}
+    .order-flow-stage{display:none;padding:22px 16px 130px}
+    .order-flow-stage.active{display:block;animation:orderFlowIn .22s ease}
+    @keyframes orderFlowIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+    .order-flow-intro{margin:0 0 16px;padding:0 2px}
+    .order-flow-kicker{color:#79a82b;font:900 10px/1 Poppins,sans-serif;letter-spacing:1.4px;text-transform:uppercase}
+    .order-flow-intro h1{margin:6px 0 5px;color:#26351b;font:900 clamp(26px,7vw,38px)/1 Poppins,sans-serif;letter-spacing:-.8px}
+    .order-flow-intro p{margin:0;color:#66705f;font:500 12px/1.5 Poppins,sans-serif}
+    .order-flow #cart-sec,.order-flow #customer-form-sec{display:block!important;margin:0;padding:0;max-width:none}
+    .order-flow #cart-sec .cart-panel,.order-flow #customer-form-sec .cust-form-box{margin:0;border:1px solid #dfe9ca;box-shadow:0 10px 28px rgba(48,74,26,.09)}
+    .order-flow #customer-form-sec>.slbl{display:none}
+    .order-flow #btn-wa,.order-flow #btn-am{max-width:none;margin-left:0;margin-right:0}
+    .order-flow #btn-wa{margin-top:14px;background:linear-gradient(90deg,#80af28,#99c83e)}
+    .order-flow #btn-am{background:#fff;border:1.5px solid #cfdcba;color:#48632f}
+    .order-flow-action{position:sticky;bottom:0;z-index:4;margin:18px -16px -130px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid #dfe9ca;box-shadow:0 -10px 28px rgba(38,53,27,.08)}
+    .order-flow-action button{width:100%;min-height:52px;border:0;border-radius:14px;background:linear-gradient(90deg,#80af28,#99c83e);color:#fff;font:900 14px/1 Poppins,sans-serif;cursor:pointer;box-shadow:0 8px 22px rgba(128,175,40,.28)}
+    body.order-flow-open{overflow:hidden}
+    body.order-flow-open>.waf,body.order-flow-open>.swa{display:none!important}
+    @media(min-width:700px){.order-flow-head{padding-inline:28px}.order-flow-stage{padding:30px 34px 150px}.order-flow-action{margin-left:-34px;margin-right:-34px;margin-bottom:-150px;padding-inline:34px}.order-flow-shell{border-left:1px solid #e1e9d3;border-right:1px solid #e1e9d3}}
+  </style>
+  <script>
+    (function(){
+      var CART_KEY='tcs_order_flow_cart_v1';
+      var flow=null,reviewStage=null,detailsStage=null,flowSteps=[];
+
+      function saveFlowCart(){
+        try{sessionStorage.setItem(CART_KEY,JSON.stringify(cart));}catch(e){}
+      }
+      function restoreFlowCart(){
+        if(cart.length)return;
+        try{
+          var saved=JSON.parse(sessionStorage.getItem(CART_KEY)||'[]');
+          if(Array.isArray(saved))cart=saved;
+        }catch(e){}
+      }
+      function updateFlowSteps(step){
+        var active=step==='details'?2:1;
+        flowSteps.forEach(function(el,index){
+          el.classList.toggle('done',index<active);
+          el.classList.toggle('active',index===active);
+        });
+      }
+      function setFlowUrl(step,replace){
+        var hash=step==='details'?'#datos-pedido':'#revisar-pedido';
+        var method=replace?'replaceState':'pushState';
+        history[method]({tcsOrderStep:step},'',location.pathname+location.search+hash);
+      }
+      function showFlowStep(step,manageHistory){
+        if(!cart.length&&step==='details')step='review';
+        flow.classList.add('open');
+        document.body.classList.add('order-flow-open');
+        reviewStage.classList.toggle('active',step==='review');
+        detailsStage.classList.toggle('active',step==='details');
+        updateFlowSteps(step);
+        flow.scrollTop=0;
+        var title=document.getElementById('orderFlowTitle');
+        if(title)title.textContent=step==='details'?'Datos de entrega':'Revisa tu pedido';
+        var back=document.getElementById('orderFlowBack');
+        if(back)back.setAttribute('aria-label',step==='details'?'Volver a tu pedido':'Volver al menu');
+        if(manageHistory!==false)setFlowUrl(step,false);
+      }
+      function closeFlow(manageHistory){
+        flow.classList.remove('open');
+        document.body.classList.remove('order-flow-open');
+        if(manageHistory!==false)history.pushState({tcsOrderStep:'menu'},'',location.pathname+location.search);
+      }
+      function closePopupsBeforeFlow(){
+        var subs=document.getElementById('subsBanner');
+        if(subs)subs.classList.add('hid');
+      }
+      function openReview(){
+        closePopupsBeforeFlow();
+        if(typeof rndrCart==='function')rndrCart();
+        showFlowStep('review',true);
+      }
+      function openDetails(){
+        if(!cart.length){alert('Agrega productos a tu pedido primero.');closeFlow(true);return;}
+        showFlowStep('details',true);
+      }
+      function goBack(){
+        if(detailsStage.classList.contains('active'))showFlowStep('review',true);
+        else closeFlow(true);
+      }
+      function reviewAndConfirm(){
+        if(typeof openModal==='function')openModal();
+      }
+      function resetBuilderAndReturn(){
+        closeFlow(true);
+        document.getElementById('builder').classList.add('hid');
+        document.getElementById('stepper').classList.add('hid');
+        document.querySelectorAll('.cbt').forEach(function(b){b.classList.remove('on');});
+        S={cat:null,step:0,tam:null,pro:[],ing:[],comp:[],adr:[],parm:false,ajonj:false,extPros:[],extIngs:[],extAdrs:[],qty:1,bag:null,bagPro:null,beb:null,promo:S.promo,promoStep:0};
+        setTimeout(function(){document.getElementById('menu-sec').scrollIntoView({behavior:'smooth',block:'start'});},80);
+      }
+      function syncFlowCartButton(){
+        var button=document.getElementById('btn-wa');
+        if(button){
+          button.setAttribute('onclick','goOrderDetails()');
+          button.innerHTML='CONTINUAR A DATOS &nbsp;&rarr;';
+        }
+      }
+      function initOrderFlow(){
+        var form=document.getElementById('customer-form-sec'),cartSection=document.getElementById('cart-sec');
+        if(!form||!cartSection||document.getElementById('orderFlow'))return;
+        flow=document.createElement('div');
+        flow.id='orderFlow';
+        flow.className='order-flow';
+        flow.setAttribute('role','dialog');
+        flow.setAttribute('aria-modal','true');
+        flow.innerHTML='<div class="order-flow-shell">'
+          +'<header class="order-flow-head"><div class="order-flow-top">'
+          +'<button class="order-flow-back" id="orderFlowBack" type="button" aria-label="Volver">&#8249;</button>'
+          +'<div class="order-flow-logo"><img src="logo-the-capital-salad.png" alt=""><span id="orderFlowTitle">Revisa tu pedido</span></div>'
+          +'<button class="order-flow-close" id="orderFlowClose" type="button" aria-label="Cerrar">&times;</button></div>'
+          +'<div class="order-flow-steps"><div class="order-flow-step">MEN&Uacute;</div><div class="order-flow-step">PEDIDO</div><div class="order-flow-step">DATOS</div><div class="order-flow-step">CONFIRMAR</div></div></header>'
+          +'<main><section class="order-flow-stage" id="orderReviewStage"><div class="order-flow-intro"><span class="order-flow-kicker">PASO 2 DE 4</span><h1>Todo en orden</h1><p>Revisa productos, cantidades y extras antes de continuar.</p></div><div id="orderReviewMount"></div></section>'
+          +'<section class="order-flow-stage" id="orderDetailsStage"><div class="order-flow-intro"><span class="order-flow-kicker">PASO 3 DE 4</span><h1>Datos y entrega</h1><p>Completa la informaci&oacute;n para calcular el env&iacute;o y preparar tu pedido.</p></div><div id="orderDetailsMount"></div><div class="order-flow-action"><button type="button" id="orderFlowConfirm">REVISAR Y CONFIRMAR PEDIDO &rarr;</button></div></section></main></div>';
+        document.body.appendChild(flow);
+        reviewStage=document.getElementById('orderReviewStage');
+        detailsStage=document.getElementById('orderDetailsStage');
+        flowSteps=Array.prototype.slice.call(flow.querySelectorAll('.order-flow-step'));
+        document.getElementById('orderReviewMount').appendChild(cartSection);
+        document.getElementById('orderDetailsMount').appendChild(form);
+        form.classList.add('vis');
+        document.getElementById('orderFlowBack').onclick=goBack;
+        document.getElementById('orderFlowClose').onclick=function(){closeFlow(true);};
+        document.getElementById('orderFlowConfirm').onclick=reviewAndConfirm;
+
+        restoreFlowCart();
+        var originalRender=window.rndrCart;
+        window.rndrCart=function(){
+          var result=originalRender.apply(this,arguments);
+          saveFlowCart();
+          syncFlowCartButton();
+          return result;
+        };
+        rndrCart=window.rndrCart;
+        window.scrollToCart=openReview;
+        scrollToCart=openReview;
+        window.goOrderDetails=openDetails;
+        window.addMore=resetBuilderAndReturn;
+        addMore=resetBuilderAndReturn;
+        rndrCart();
+
+        window.addEventListener('popstate',function(){
+          if(location.hash==='#datos-pedido')showFlowStep('details',false);
+          else if(location.hash==='#revisar-pedido')showFlowStep('review',false);
+          else closeFlow(false);
+        });
+        if(location.hash==='#datos-pedido')showFlowStep('details',false);
+        else if(location.hash==='#revisar-pedido')showFlowStep('review',false);
+      }
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initOrderFlow);
+      else initOrderFlow();
+    })();
+  </script>
+
 </body>
 </html>
