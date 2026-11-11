@@ -7093,68 +7093,75 @@ loadAdminClients = function(){
       .hero-badge-art{margin-top:-8px}
       .hero h1{height:155px;margin:0 0 -4px}
       .wrap{padding-bottom:44px}
+      #promo-sec .promo-circles{justify-content:center}
     }
+
+    footer{width:min(100%,860px);max-width:860px}
+    footer .fin{max-width:860px}
 
     /* The approved mobile artwork is a near-square composition. Keep every
        element tied to that canvas instead of inheriting desktop heights. */
     @media(max-width:700px){
       .hero{
-        display:block;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:flex-start;
         width:100%;
-        height:clamp(410px,118vw,480px);
-        min-height:0;
-        padding:0;
+        height:auto;
+        min-height:595px;
+        padding:18px 12px 56px;
       }
       .hero-logo{
-        position:absolute;
+        position:relative;
         z-index:4;
-        top:3%;
-        left:50%;
-        width:55%;
-        height:auto;
-        margin:0;
-        transform:translateX(-50%);
+        top:auto;
+        left:auto;
+        width:220px;
+        height:220px;
+        margin:0 0 12px;
+        transform:none;
       }
       .hero-badge-art{
-        position:absolute;
+        position:relative;
         z-index:4;
-        top:47.5%;
-        left:50%;
-        width:59%;
+        top:auto;
+        left:auto;
+        width:235px;
         height:auto;
-        margin:0;
-        transform:translateX(-50%);
+        margin:0 0 20px;
+        transform:none;
       }
       .hero h1{
-        position:absolute;
+        position:relative;
         z-index:4;
-        top:57.5%;
-        left:50%;
-        width:82%;
-        height:25%;
-        margin:0;
-        transform:translateX(-50%);
+        top:auto;
+        left:auto;
+        width:86%;
+        height:118px;
+        margin:0 0 14px;
+        transform:none;
       }
       .hero p{
-        position:absolute;
+        position:relative;
         z-index:4;
-        top:79%;
-        left:50%;
-        width:58%;
-        max-width:235px;
-        margin:0;
-        transform:translateX(-50%);
-        font-size:10.5px;
-        line-height:1.3;
+        top:auto;
+        left:auto;
+        width:75%;
+        max-width:280px;
+        margin:0 0 18px;
+        transform:none;
+        font-size:11px;
+        line-height:1.35;
       }
       .hero-cta{
-        position:absolute;
+        position:relative;
         z-index:20!important;
-        top:83%;
-        left:50%;
-        width:59%;
+        top:auto;
+        left:auto;
+        width:240px;
         margin:0;
-        transform:translateX(-50%);
+        transform:none;
       }
       .hero-food-baguette{
         width:74%;
@@ -7205,6 +7212,10 @@ loadAdminClients = function(){
     }
 
     @media(max-width:360px){
+      .hero{min-height:565px}
+      .hero-logo{width:195px;height:195px}
+      .hero h1{height:105px}
+      .hero-cta{width:220px}
       .hero p{font-size:9.5px}
       .cbt .clbl{font-size:10.5px}
       .cbt .csub{font-size:9px}
